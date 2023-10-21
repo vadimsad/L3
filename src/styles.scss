@@ -84,11 +84,18 @@ img {
   padding: 30px 0 72px;
 }
 
-.btnFav {
+.btn-fav {
   border: 0;
   background: none;
   padding: 0;
   margin: 0;
+
+  &.is__active {
+    svg {
+      stroke: var(--key-color);
+      stroke-width: 2px;
+    }
+  }
 
   svg {
     width: 32px;
@@ -120,7 +127,8 @@ img {
   }
 }
 
-.cart {
+.cart,
+.fav {
   position: relative;
 }
 
