@@ -26,7 +26,6 @@ class ProductDetail extends Component {
 
     if (!this.product) return;
 
-    const isInFav = await favService.isInFav(this.product);
     const { id, src, name, description, salePriceU } = this.product;
 
     this.view.photo.setAttribute('src', src);
@@ -35,11 +34,12 @@ class ProductDetail extends Component {
     this.view.price.innerText = formatPrice(salePriceU);
     this.view.btnBuy.onclick = this._addToCart.bind(this);
     this.view.btnFav.onclick = this._toggleFav.bind(this);
-    this.view.btnFav.classList.toggle('is__active', isInFav);
 
     const isInCart = await cartService.isInCart(this.product);
+    const isInFav = await favService.isInFav(this.product);
 
     if (isInCart) this._setInCart();
+    this.view.btnFav.classList.toggle('is__active', isInFav);
 
     fetch(`/api/getProductSecretKey?id=${id}`)
       .then((res) => res.json())
