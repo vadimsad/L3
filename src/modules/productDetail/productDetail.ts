@@ -4,6 +4,7 @@ import { formatPrice } from '../../utils/helpers';
 import { ProductData } from 'types';
 import html from './productDetail.tpl.html';
 import { cartService } from '../../services/cart.service';
+import { statsService } from '../../services/stats.service';
 
 class ProductDetail extends Component {
   more: ProductList;
@@ -37,10 +38,11 @@ class ProductDetail extends Component {
 
     if (isInCart) this._setInCart();
 
-    fetch(`/api/getProductSecretKey?id=${id}`)
+    const secretKey = fetch(`/api/getProductSecretKey?id=${id}`)
       .then((res) => res.json())
       .then((secretKey) => {
         this.view.secretKey.setAttribute('content', secretKey);
+        return secretKey;
       });
 
     fetch('/api/getPopularProducts')
@@ -48,12 +50,15 @@ class ProductDetail extends Component {
       .then((products) => {
         this.more.update(products);
       });
+
+    statsService.onViewProduct(this.product, await secretKey);
   }
 
   private _addToCart() {
     if (!this.product) return;
 
     cartService.addProduct(this.product);
+    statsService.onAddToCart(this.product);
     this._setInCart();
   }
 

@@ -3,6 +3,7 @@ import { Product } from '../product/product';
 import html from './checkout.tpl.html';
 import { formatPrice } from '../../utils/helpers';
 import { cartService } from '../../services/cart.service';
+import { statsService } from '../../services/stats.service';
 import { ProductData } from 'types';
 
 class Checkout extends Component {
@@ -29,12 +30,27 @@ class Checkout extends Component {
   }
 
   private async _makeOrder() {
+    this._toggleLoading(true);
+
     await cartService.clear();
     fetch('/api/makeOrder', {
       method: 'POST',
       body: JSON.stringify(this.products)
+    }).then(async (res) => {
+      if (res.ok) {
+        await statsService.onOrder(this.products);
+        window.location.href = '/?isSuccessOrder';
+      }
+    }).catch((err) => {
+      console.error(err);
+    }).finally(() => {
+      this._toggleLoading(false);
     });
-    window.location.href = '/?isSuccessOrder';
+  }
+
+  private _toggleLoading(isLoading: boolean) {
+    this.view.btnOrder.toggleAttribute('disabled', isLoading);
+    this.view.loader.classList.toggle('hide', !isLoading);
   }
 }
 

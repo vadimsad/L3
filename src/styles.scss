@@ -174,3 +174,27 @@ img {
     margin-bottom: 30px;
   }
 }
+
+.loader {
+  position: relative;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 0.25em solid;
+  border-color: var(--key-color) var(--key-color) transparent;
+  vertical-align: middle;
+  font-size: 14px;
+  transform: translateZ(0);
+  animation: rotate 0.8s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+      transform: rotate(0deg);
+  }
+
+  100% {
+      transform: rotate(360deg);
+  }
+}
