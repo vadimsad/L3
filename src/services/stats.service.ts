@@ -4,9 +4,8 @@ import { ProductData } from "types";
 type StatBody = {
     type: StatEventType,
     payload: object,
+    timestamp: number
 };
-
-type StatBodySent = StatBody & { timestamp: number };
 
 enum StatEventType {
     ROUTE = 'route',
@@ -17,55 +16,58 @@ enum StatEventType {
 }
 
 class StatsService {
-    onRoute(url: string) {
+    onRoute(url: string, timestamp: number) {
         const action = {
             type: StatEventType.ROUTE,
             payload: { url },
+            timestamp,
         }
 
         this._send(action);
     }
 
-    onViewProduct(product: ProductData, secretKey: string) {
+    onViewProduct(product: ProductData, secretKey: string, timestamp: number) {
         const action = {
             type: this._isEmpty(product.log) ? StatEventType.VIEW_CARD : StatEventType.VIEW_CARD_PROMO,
             payload: { ...product, secretKey },
+            timestamp,
         }
 
         this._send(action);
     }
 
-    onAddToCart(product: ProductData) {
+    onAddToCart(product: ProductData, timestamp: number) {
         const action = {
             type: StatEventType.ADD_TO_CART,
             payload: { ...product },
+            timestamp,
         }
 
         this._send(action);
     }
 
-    onOrder(products: ProductData[]) {
+    onOrder(products: ProductData[], timestamp: number) {
         const action = {
             type: StatEventType.PURCHASE,
             payload: { 
                 orderId: genUUID(),
                 totalPrice: products.reduce((acc, product) => (acc += product.salePriceU), 0),
                 productIds: products.map(product => product.id),
-             }
+            },
+            timestamp,
         }
 
         return this._send(action);
     }
 
     private async _send(data: StatBody) {
-        const dataToSend: StatBodySent = {
-            ...data,
-            timestamp: new Date().getTime(),
-        };
+        console.log(data.payload)
+        console.log('Время создания события: ' + data.timestamp)
+        console.log('Время отправки: ' + new Date().getTime())
 
         return fetch('/api/sendEvent', {
             method: 'POST',
-            body: JSON.stringify(dataToSend)
+            body: JSON.stringify(data)
         });
     }
 

@@ -20,6 +20,7 @@ class ProductDetail extends Component {
   async render() {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = Number(urlParams.get('id'));
+    const timestamp = new Date().getTime();
 
     const productResp = await fetch(`/api/getProduct?id=${productId}`);
     this.product = await productResp.json();
@@ -38,11 +39,11 @@ class ProductDetail extends Component {
 
     if (isInCart) this._setInCart();
 
-    const secretKey = fetch(`/api/getProductSecretKey?id=${id}`)
+    fetch(`/api/getProductSecretKey?id=${id}`)
       .then((res) => res.json())
       .then((secretKey) => {
+        statsService.onViewProduct(this.product!, secretKey, timestamp)
         this.view.secretKey.setAttribute('content', secretKey);
-        return secretKey;
       });
 
     fetch('/api/getPopularProducts')
@@ -50,15 +51,13 @@ class ProductDetail extends Component {
       .then((products) => {
         this.more.update(products);
       });
-
-    statsService.onViewProduct(this.product, await secretKey);
   }
 
   private _addToCart() {
     if (!this.product) return;
 
     cartService.addProduct(this.product);
-    statsService.onAddToCart(this.product);
+    statsService.onAddToCart(this.product, new Date().getTime());
     this._setInCart();
   }
 

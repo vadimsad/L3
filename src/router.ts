@@ -32,6 +32,6 @@ export default class Router {
     component.attach(this.$appRoot);
     component.render();
 
-    statsService.onRoute(window.location.href);
+    statsService.onRoute(window.location.href, new Date().getTime());
   }
 }

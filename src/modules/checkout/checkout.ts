@@ -38,7 +38,7 @@ class Checkout extends Component {
       body: JSON.stringify(this.products)
     }).then(async (res) => {
       if (res.ok) {
-        await statsService.onOrder(this.products);
+        await statsService.onOrder(this.products, new Date().getTime());
         window.location.href = '/?isSuccessOrder';
       }
     }).catch((err) => {
